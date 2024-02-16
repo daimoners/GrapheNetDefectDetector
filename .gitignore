@@ -1,0 +1,8 @@
+.vscode/
+data/
+*.csv
+*.pt
+*.png
+*.xyz
+__pycache__/
+train_yolo/
