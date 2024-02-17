@@ -17,7 +17,7 @@ class Features:
         image: Path | np.ndarray,
         dest_path: Path | None = None,
         grayscale: bool = False,
-        min_area: int = 5,
+        min_area: int = 1,
     ) -> dict:
         # Load image as grayscale
         if isinstance(image, Path):
@@ -84,7 +84,7 @@ class Features:
     def extract_edge_features(
         image: Path | np.ndarray,
         grayscale: bool = False,
-        min_area: int = 5,
+        min_area: int = 1,
     ) -> dict:
         # Load image as grayscale
         if isinstance(image, Path):

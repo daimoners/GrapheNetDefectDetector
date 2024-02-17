@@ -124,10 +124,14 @@ class Utils:
             )
 
     @staticmethod
-    def from_xyz_to_png(spath: Path, dpath: Path, items: int, resolution: int = 320):
+    def from_xyz_to_png(
+        spath: Path, dpath: Path, items: int = None, resolution: int = 320
+    ):
         dpath.mkdir(exist_ok=True, parents=True)
 
         files = [f for f in spath.iterdir() if f.suffix.lower() == ".xyz"]
+        if items is None:
+            items = len(files)
 
         pbar = tqdm(total=len(files) if items > len(files) else items)
         for i, file in enumerate(files):
