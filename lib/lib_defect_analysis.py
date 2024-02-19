@@ -21,7 +21,7 @@ class Features:
     ) -> dict:
         # Load image as grayscale
         if isinstance(image, Path):
-            img = cv2.imread(str(image), 0 if grayscale else -1)
+            img = cv2.imread(str(image), cv2.IMREAD_GRAYSCALE if grayscale else -1)
         else:
             img = image.copy()
 
