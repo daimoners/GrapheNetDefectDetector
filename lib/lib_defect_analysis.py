@@ -122,8 +122,8 @@ class Features:
         edge_features = {
             "number_of_edges": num_edges,
             "edge_density": edge_density,
-            "mean_length_of_edges": mean_contour_length,
-            "std_length_of_edges": std_contour_length,
+            # "mean_length_of_edges": mean_contour_length,
+            # "std_length_of_edges": std_contour_length,
         }
 
         return edge_features

@@ -143,24 +143,25 @@ class Utils:
 
     @staticmethod
     def generate_yolo_crops(
-        spath: Path, dpath: Path, yolo_ckpt_path: Path, binary_mask: bool = False
+        spath: Path, dpath: Path, yolo_ckpt_path: Path, binary_mask: bool = False, device:str = 'cuda'
     ):
         dpath.mkdir(exist_ok=True, parents=True)
 
-        model = YOLO(str(yolo_ckpt_path), task="detect")
+        model = YOLO(str(yolo_ckpt_path), task="detect").to(torch.device(device))
 
         images = [
             f for f in spath.iterdir() if f.suffix.lower() in Utils.IMAGE_EXTENSIONS
         ]
 
         for image in tqdm(images):
+       
             results = model(str(image))
             boxes = results[0].boxes
 
             for i, box in enumerate(boxes):
 
-                array = torch.Tensor.numpy(box.xyxy)
-
+                array = torch.Tensor(box.xyxy).cpu().numpy()
+               
                 x1 = math.floor(array[0, 0])
                 y1 = math.floor(array[0, 1])
                 x2 = math.ceil(array[0, 2])

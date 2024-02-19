@@ -1,4 +1,4 @@
-name: yolo
+name: yolo_gdd
 channels:
   - conda-forge
   - defaults
@@ -115,4 +115,4 @@ dependencies:
       - tzdata==2024.1
       - ultralytics==8.1.14
       - urllib3==2.2.0
-prefix: $HOME/miniconda3/envs/yolo
+prefix: $HOME/miniconda3/envs/yolo_gdd
