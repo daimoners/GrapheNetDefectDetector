@@ -127,7 +127,11 @@ class Utils:
     def from_xyz_to_png(
         spath: Path, dpath: Path, items: int = None, resolution: int = 320
     ):
-        dpath.mkdir(exist_ok=True, parents=True)
+        if dpath.is_dir():
+            print(f"WARNING: the directory {dpath} already exists!")
+            return
+        else:
+            dpath.mkdir(exist_ok=True, parents=True)
 
         files = [f for f in spath.iterdir() if f.suffix.lower() == ".xyz"]
         if items is None:
@@ -143,9 +147,19 @@ class Utils:
 
     @staticmethod
     def generate_yolo_crops(
-        spath: Path, dpath: Path, yolo_ckpt_path: Path, binary_mask: bool = False, device:str = 'cuda'
+        spath: Path,
+        dpath: Path,
+        yolo_ckpt_path: Path,
+        binary_mask: bool = False,
+        device: str = "cuda",
+        verbose: bool = False,
     ):
-        dpath.mkdir(exist_ok=True, parents=True)
+
+        if dpath.is_dir():
+            print(f"WARNING: the directory {dpath} already exists!")
+            return
+        else:
+            dpath.mkdir(exist_ok=True, parents=True)
 
         model = YOLO(str(yolo_ckpt_path), task="detect").to(torch.device(device))
 
@@ -154,14 +168,14 @@ class Utils:
         ]
 
         for image in tqdm(images):
-       
-            results = model(str(image))
+
+            results = model(str(image), verbose=verbose)
             boxes = results[0].boxes
 
             for i, box in enumerate(boxes):
 
                 array = torch.Tensor(box.xyxy).cpu().numpy()
-               
+
                 x1 = math.floor(array[0, 0])
                 y1 = math.floor(array[0, 1])
                 x2 = math.ceil(array[0, 2])

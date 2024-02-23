@@ -2,9 +2,7 @@ try:
     import cv2
     from pathlib import Path
     import numpy as np
-    from tqdm import tqdm
-    from scipy.fftpack import fft2, fftshift
-    from icecream import ic
+    from skimage.feature import graycomatrix, graycoprops
 
 except Exception as e:
     print(f"Some module are missing for {__file__}: {e}\n")
@@ -84,7 +82,6 @@ class Features:
     def extract_edge_features(
         image: Path | np.ndarray,
         grayscale: bool = False,
-        min_area: int = 1,
     ) -> dict:
         # Load image as grayscale
         if isinstance(image, Path):
@@ -99,34 +96,40 @@ class Features:
         num_edges = np.sum(edges == 255)
         edge_density = num_edges / (img.shape[0] * img.shape[1])
 
-        # Find contours in binary mask
-        contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-
-        # Filter contours based on area
-        contours = [
-            contour for contour in contours if cv2.contourArea(contour) > min_area
-        ]
-
-        if len(contours) == 0:
-            return None
-
-        # Compute mean and standard deviation of contour lengths
-        contour_lengths = [cv2.arcLength(contour, True) for contour in contours]
-        if len(contour_lengths) > 0:
-            mean_contour_length = np.mean(contour_lengths)
-            std_contour_length = np.std(contour_lengths)
-        else:
-            mean_contour_length = 0
-            std_contour_length = 0
-
         edge_features = {
             "number_of_edges": num_edges,
             "edge_density": edge_density,
-            # "mean_length_of_edges": mean_contour_length,
-            # "std_length_of_edges": std_contour_length,
         }
 
         return edge_features
+
+    def extract_texture_features(image: Path | np.ndarray) -> dict:
+        # Load image
+        if isinstance(image, Path):
+            img = cv2.imread(str(image), 0)
+        else:
+            img = image.copy()
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Compute GLCM matrix
+        glcm = graycomatrix(
+            img, distances=[5], angles=[0], levels=256, symmetric=True, normed=True
+        )
+
+        # Compute texture features
+        contrast = graycoprops(glcm, "contrast")[0][0]
+        homogeneity = graycoprops(glcm, "homogeneity")[0][0]
+        energy = graycoprops(glcm, "energy")[0][0]
+        correlation = graycoprops(glcm, "correlation")[0][0]
+
+        texture_features = {
+            "GLCM_contrast": contrast,
+            "GLCM_homogeneity": homogeneity,
+            "GLCM_energy": energy,
+            "GLCM_correlation": correlation,
+        }
+
+        return texture_features
 
 
 if __name__ == "__main__":
