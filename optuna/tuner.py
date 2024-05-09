@@ -7,14 +7,15 @@ try:
     from sklearn.model_selection import train_test_split
     import xgboost as xgb
     import torch
-
+    import json 
+    
 except Exception as e:
     print("Some module are missing {}".format(e))
 
 logging.basicConfig(filename="optuna.log", level=logging.INFO)
 
-X_norm = np.load("./X_norm.npy")
-y_norm = np.load("./y_norm.npy")
+X_norm = np.load("./x_norm_ip_ev.npy")
+y_norm = np.load("./y_norm_ip_ev.npy")
 
 X_train, X_test, y_train, y_test = train_test_split(
     X_norm, y_norm, test_size=0.1, random_state=13
@@ -26,7 +27,7 @@ y_train = torch.tensor(y_train).to(torch.device(device="cuda"))
 def objective(trial):
 
     params = {
-        "n_estimators": trial.suggest_int("n_estimators", 600, 2000),
+        "n_estimators": trial.suggest_int("n_estimators", 200, 3000),
         "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.1, log=True),
         "max_depth": trial.suggest_int("max_depth", 3, 10),
         "gamma": trial.suggest_float("gamma", 0.000001, 5, log=True),
@@ -49,7 +50,13 @@ def objective(trial):
 
 
 study = optuna.create_study(direction="maximize", study_name="test_optuna")
-study.optimize(objective, n_trials=150) # occhio qui che ci vuole un po
+study.optimize(objective, n_trials=500) # occhio qui che ci vuole un po
+
+best_params = study.best_params
+
+# Salva i migliori parametri in un file JSON
+with open('best_params.json', 'w') as f:
+    json.dump(best_params, f, indent=4)
 
 print("Best trial:")
 trial = study.best_trial
