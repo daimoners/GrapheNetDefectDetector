@@ -22,10 +22,19 @@ class Utils:
     IMAGE_EXTENSIONS = (".jpg", ".png", ".jpeg")
 
     @staticmethod
-    def generate_bonds_png(spath: Path, dpath: Path, resolution: int = 320):
+    def generate_bonds_png(
+        spath: Path,
+        dpath: Path,
+        max_dim: list,
+        multiplier: int = 3,
+    ):
 
         with Trajectory(str(spath)) as trajectory:
             mol = trajectory.read()
+
+        resolution = round(
+            multiplier * (5 + np.max([np.abs(max_dim[0]), np.abs(max_dim[1])]))
+        )
 
         B = Image.new("RGB", (resolution, resolution))
         B_ = ImageDraw.Draw(B)
@@ -36,10 +45,10 @@ class Utils:
         bonds = mol.topology.bonds
 
         for i in range(len(bonds)):
-            x_1 = round(mol.positions[bonds[i][0]][0] * 2) + resolution / 2
-            y_1 = round(mol.positions[bonds[i][0]][1] * 2) + resolution / 2
-            x_2 = round(mol.positions[bonds[i][1]][0] * 2) + resolution / 2
-            y_2 = round(mol.positions[bonds[i][1]][1] * 2) + resolution / 2
+            x_1 = int(round(mol.positions[bonds[i][0]][0] * multiplier))
+            y_1 = int(round(mol.positions[bonds[i][0]][1] * multiplier))
+            x_2 = int(round(mol.positions[bonds[i][1]][0] * multiplier))
+            y_2 = int(round(mol.positions[bonds[i][1]][1] * multiplier))
             line = [(x_1, y_1), (x_2, y_2)]
             first_atom = mol.atoms[bonds[i][0]].name
             second_atom = mol.atoms[bonds[i][1]].name
@@ -125,7 +134,11 @@ class Utils:
 
     @staticmethod
     def from_xyz_to_png(
-        spath: Path, dpath: Path, items: int = None, resolution: int = 320
+        spath: Path,
+        dpath: Path,
+        max_dim: list,
+        items: int = None,
+        multiplier: int = 6,
     ):
         if dpath.is_dir():
             print(f"WARNING: the directory {dpath} already exists!")
@@ -141,7 +154,7 @@ class Utils:
         for i, file in enumerate(files):
             if i >= items:
                 break
-            Utils.generate_bonds_png(file, dpath, resolution)
+            Utils.generate_bonds_png(file, dpath, max_dim, multiplier)
             pbar.update(1)
         pbar.close()
 

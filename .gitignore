@@ -6,3 +6,4 @@ data/
 *.xyz
 __pycache__/
 train_yolo/
+runs/

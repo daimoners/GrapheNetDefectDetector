@@ -1,0 +1,7 @@
+path: "/home/tom/git_workspace/GrapheNetDefectDetector/yolo/data/augmented_dataset" # dataset root dir
+train: images/train
+val: images/val
+
+# Classes
+names:
+  0: Defect

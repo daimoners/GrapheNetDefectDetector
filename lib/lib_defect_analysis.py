@@ -24,7 +24,7 @@ class Features:
             img = image.copy()
 
         # Threshold image to create binary mask
-        _, mask = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(img, 200, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
         # Find contours in binary mask
         contours, _ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_TC89_L1)
@@ -134,3 +134,20 @@ class Features:
 
 if __name__ == "__main__":
     pass
+    # from tqdm.rich import tqdm
+
+    # crops_path = Path("/home/tom/git_workspace/GrapheNetDefectDetector/data/crops")
+    # images = [
+    #     f for f in crops_path.iterdir() if f.suffix.lower() in Features.IMAGE_EXTENSIONS
+    # ]
+
+    # for image in tqdm(images):
+
+    #     shape_features = Features.extract_shape_features(
+    #         image,
+    #         dest_path=Path(
+    #             "/home/tom/git_workspace/GrapheNetDefectDetector/data/test_area"
+    #         ).joinpath(f"{image.stem}.png"),
+    #         grayscale=True,
+    #         min_area=1,
+    #     )
