@@ -183,16 +183,25 @@ def delete_similar_images(
 
 
 def check_unsupported_file_types(data_path: Path):
-    for dir in ["images", "labels"]:
-        files = [
-            f
-            for f in data_path.joinpath(dir).iterdir()
-            if (f.suffix.lower() not in IMAGES_SUFFIX and f.suffix.lower() != ".txt")
-        ]
-        if len(files) > 0:
-            raise Exception(
-                f"Unsopported file types detected in {data_path.joinpath(dir)}"
-            )
+    files = [
+        f
+        for f in data_path.joinpath("images").iterdir()
+        if (f.suffix.lower() not in IMAGES_SUFFIX)
+    ]
+    if len(files) > 0:
+        raise Exception(
+            f"Unsopported file types detected in {data_path.joinpath("images")}"
+        )
+    
+    labels = [
+        f
+        for f in data_path.joinpath("labels").iterdir()
+        if (f.suffix.lower() != ".txt")
+    ]
+    if len(labels) > 0:
+        raise Exception(
+            f"Unsopported file types detected in {data_path.joinpath("labels")}"
+        )
 
 
 @hydra.main(version_base="1.2", config_path="config", config_name="dataset")

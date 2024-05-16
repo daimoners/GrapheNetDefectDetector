@@ -175,7 +175,10 @@ class Utils:
         else:
             dpath.mkdir(exist_ok=True, parents=True)
 
-        model = YOLO(str(yolo_ckpt_path), task="detect").to(torch.device(device))
+        model = YOLO(
+            str(yolo_ckpt_path),
+            task="detect",
+        ).to(torch.device(device))
 
         images = [
             f for f in spath.iterdir() if f.suffix.lower() in Utils.IMAGE_EXTENSIONS
