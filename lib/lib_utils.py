@@ -234,3 +234,68 @@ class Utils:
                     str(dpath.joinpath(f"{image.stem}_crop_{i}.png")),
                     cropped_image,
                 )
+
+    @staticmethod
+    def read_from_xyz_file(file_path: Path):
+        """Read xyz files and return lists of x,y,z coordinates and atoms"""
+
+        X = []
+        Y = []
+        Z = []
+        atoms = []
+
+        with open(str(file_path), "r") as f:
+            num_atom = int(next(f))
+            next(f)  # ignore the comment
+
+            for _ in range(num_atom):
+                l = next(f).split()
+                if len(l) == 4 or len(l) == 5:
+                    X.append(float(l[1]))
+                    Y.append(float(l[2]))
+                    Z.append(float(l[3]))
+                    atoms.append(str(l[0]))
+
+        X = np.asarray(X)
+        Y = np.asarray(Y)
+        Z = np.asarray(Z)
+
+        return atoms, X, Y, Z
+
+    @staticmethod
+    def check_x_interface_num_atoms(
+        file_path: Path,
+        num_atoms: int = 32,
+        delta: float = 1.42,
+    ):
+        atoms, X, Y, Z = Utils.read_from_xyz_file(file_path)
+
+        y_up = [y for y in Y if max(Y) - delta <= y <= max(Y)]
+        y_down = [y for y in Y if min(Y) <= y <= min(Y) + delta]
+
+        if len(y_up) == len(y_down) == num_atoms:
+            return True
+        else:
+            ic(
+                f"Warning, {file_path.name} failed check interface atom counts ({len(y_up)}!={len(y_down)}!={num_atoms}) and will be deleted!"
+            )
+            return False
+
+
+if __name__ == "__main__":
+    pass
+    # import pandas as pd
+
+    # ic.disable()
+
+    # dataset = Path("/home/tom/git_workspace/GrapheNetDefectDetector/data/xyz_files")
+
+    # files = [f for f in dataset.iterdir() if f.suffix.lower() == ".xyz"]
+
+    # brokens = []
+    # for file in tqdm(files):
+    #     if not Utils.check_x_interface_num_atoms(file):
+    #         brokens.append(file.stem)
+
+    # df = pd.DataFrame(brokens, columns=["file_name"])
+    # df.to_csv(dataset.joinpath("brokens.csv"), index=False)
