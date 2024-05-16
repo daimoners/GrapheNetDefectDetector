@@ -166,6 +166,7 @@ class Utils:
         binary_mask: bool = False,
         device: str = "cuda",
         verbose: bool = False,
+        confidence: float = 0.75,
     ):
 
         if dpath.is_dir():
@@ -174,7 +175,10 @@ class Utils:
         else:
             dpath.mkdir(exist_ok=True, parents=True)
 
-        model = YOLO(str(yolo_ckpt_path), task="detect").to(torch.device(device))
+        model = YOLO(
+            str(yolo_ckpt_path),
+            task="detect",
+        ).to(torch.device(device))
 
         images = [
             f for f in spath.iterdir() if f.suffix.lower() in Utils.IMAGE_EXTENSIONS
@@ -186,6 +190,9 @@ class Utils:
             boxes = results[0].boxes
 
             for i, box in enumerate(boxes):
+
+                if box.conf < confidence:
+                    continue
 
                 array = torch.Tensor(box.xyxy).cpu().numpy()
 
