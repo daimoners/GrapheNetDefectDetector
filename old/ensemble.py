@@ -46,16 +46,13 @@ class NeuralNet(nn.Module):
             )
             self.first_layer.bias.fill_(0.0)
 
-        # Costruiamo i layers hidden
         self.hidden_layers = []
         for _ in range(num_hidden_layers):
             self.hidden_layers.append(nn.Linear(hidden_dim, hidden_dim))
             self.hidden_layers.append(nn.ReLU())
 
-        # Aggiungiamo il layer di output
         self.output_layer = nn.Linear(hidden_dim, 1)
 
-        # Creiamo il modello sequenziale
         layers = [self.first_layer] + self.hidden_layers + [self.output_layer]
         self.sequential = nn.Sequential(*layers)
 
