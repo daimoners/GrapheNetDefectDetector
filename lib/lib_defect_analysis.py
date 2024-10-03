@@ -3,7 +3,7 @@ try:
     from pathlib import Path
     import numpy as np
     from skimage.feature import graycomatrix, graycoprops
-
+    from scipy.stats import skew, kurtosis
 except Exception as e:
     print(f"Some module are missing for {__file__}: {e}\n")
 
@@ -130,6 +130,61 @@ class Features:
         }
 
         return texture_features
+    def extract_frequency_features(image: Path | np.ndarray) -> dict:
+        # Load image as grayscale
+        if isinstance(image, Path):
+            img = cv2.imread(str(image), cv2.IMREAD_GRAYSCALE)
+        else:
+            img = image.copy()
+            if len(img.shape) == 3:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Apply Fourier Transform
+        f = np.fft.fft2(img)
+        fshift = np.fft.fftshift(f)
+        
+        # Avoid division by zero by adding a small constant
+        magnitude_spectrum = 20 * np.log(np.abs(fshift) + 1e-10)
+
+        # Compute frequency features
+        mean_freq = np.mean(magnitude_spectrum)
+        std_freq = np.std(magnitude_spectrum)
+        max_freq = np.max(magnitude_spectrum)
+        min_freq = np.min(magnitude_spectrum)
+        median_freq = np.median(magnitude_spectrum)
+        energy = np.sum(np.abs(fshift)**2)
+        
+        rows, cols = magnitude_spectrum.shape
+        crow, ccol = rows // 2, cols // 2  # center
+ 
+        histogram, _ = np.histogram(magnitude_spectrum, bins=256, range=(0, 256), density=True)
+        entropy = -np.sum(histogram * np.log2(histogram + 1e-10))  # Adding a small value to avoid log(0)
+        
+    
+        skewness = skew(magnitude_spectrum.flatten())
+        kurt = kurtosis(magnitude_spectrum.flatten())
+        
+        low_freq_energy = np.sum(magnitude_spectrum[:crow, :ccol])
+        high_freq_energy = np.sum(magnitude_spectrum[crow:, ccol:])
+        frequency_contrast = high_freq_energy - low_freq_energy
+
+        frequency_features = {
+            "mean_frequency": mean_freq,
+            "std_frequency": std_freq,
+            "max_frequency": max_freq,
+            "min_frequency": min_freq,
+            "median_frequency": median_freq,
+            "energy": energy,
+            "entropy": entropy,
+            "skewness": skewness,
+            "kurtosis": kurt,
+            "low_frequency_energy": low_freq_energy,
+            "high_frequency_energy": high_freq_energy,
+            "frequency_contrast": frequency_contrast,
+        }
+
+        return frequency_features
+
 
 
 if __name__ == "__main__":
