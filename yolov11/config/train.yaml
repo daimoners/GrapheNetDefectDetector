@@ -1,0 +1,8 @@
+path: /home/tom/git_workspace/GrapheNetDefectDetector/yolov11/data/augmented_dataset
+train: images/train
+val: images/val
+test: images/test
+
+# Classes
+names:
+  0: Defect

@@ -1,0 +1,7 @@
+package_path: /home/tom/git_workspace/GrapheNetDefectDetector/yolov11
+exported_data_path: ${package_path}/data/original_data
+dataset_path: ${package_path}/data/augmented_dataset
+ssim_threshold: 0.8
+split: 0.7
+augmentation: [color, negative, rotate, flip]
+admitted_labels: ["0"]
