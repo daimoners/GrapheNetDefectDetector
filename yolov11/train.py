@@ -9,7 +9,9 @@ except Exception as e:
 
 
 def main():
-    model = YOLO("yolo11n.pt")
+    # yolo_model = "yolo11n.pt"
+    yolo_model = "yolov10n.pt"
+    model = YOLO(yolo_model)
 
     if Path(__file__).parent.joinpath("runs").is_dir():
         shutil.rmtree(Path(__file__).parent.joinpath("runs"))
@@ -43,7 +45,7 @@ def main():
 
     shutil.copy(
         Path(__file__).parent.joinpath("runs", "detect", "train", "weights", "best.pt"),
-        Path(__file__).parent.joinpath("best_model.pt"),
+        Path(__file__).parent.joinpath(f"best_model_{yolo_model}"),
     )
 
     print(f"Completed training in {(end-start)/60:.3f} minutes")

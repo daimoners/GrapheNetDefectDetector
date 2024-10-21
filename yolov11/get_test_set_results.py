@@ -219,7 +219,8 @@ def plot_results(out_path: Path):
 
 if __name__ == "__main__":
     ic.disable()
-    model_path = Path("./best_model.pt")
+    yolo_model = "yolov10n"
+    model_path = Path(f"./best_model_{yolo_model}.pt")
     yolo_yaml_path = Path("./config/train.yaml")
     out_path = Path("./results")
     imgsz = 256
