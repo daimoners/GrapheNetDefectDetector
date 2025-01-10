@@ -7,3 +7,5 @@ data*/
 __pycache__/
 train_yolo/
 runs/
+PLOTS_TESI.ipynb
+.codegpt
