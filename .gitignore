@@ -9,3 +9,6 @@ train_yolo/
 runs/
 PLOTS_TESI.ipynb
 .codegpt
+RM/
+*.zip
+bkp/
