@@ -82,6 +82,8 @@ class Features:
     def extract_edge_features(
         image: Path | np.ndarray,
         grayscale: bool = False,
+        dest_path: Path | None = None,
+        min_area: int = 1,
     ) -> dict:
         # Load image as grayscale
         if isinstance(image, Path):
@@ -89,8 +91,31 @@ class Features:
         else:
             img = image.copy()
 
+        # Threshold image to create binary mask
+        _, mask = cv2.threshold(img, 200, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # Find contours in binary mask
+        contours, _ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_TC89_L1)
+
+        # Filter contours based on area
+        contours = [
+            contour for contour in contours if cv2.contourArea(contour) > min_area
+        ]
+
+        if len(contours) == 0:
+            return None
+        # Get largest contour by area
+        largest_contour = max(contours, key=cv2.contourArea)
+        # Crea un'immagine completamente bianca
+        white_image = np.ones_like(img) * 255
+
+        # Disegna il contorno più grande sull'immagine bianca
+        cv2.drawContours(white_image, [largest_contour], -1, 0, thickness=cv2.FILLED)
+
         # Apply Canny edge detection algorithm
-        edges = cv2.Canny(img, 100, 200)
+        edges = cv2.Canny(white_image, 100, 200)
+        if dest_path is not None:
+            cv2.imwrite(str(dest_path), edges)
 
         # Compute edge features
         num_edges = np.sum(edges == 255)
@@ -130,6 +155,7 @@ class Features:
         }
 
         return texture_features
+
     def extract_frequency_features(image: Path | np.ndarray) -> dict:
         # Load image as grayscale
         if isinstance(image, Path):
@@ -142,7 +168,7 @@ class Features:
         # Apply Fourier Transform
         f = np.fft.fft2(img)
         fshift = np.fft.fftshift(f)
-        
+
         # Avoid division by zero by adding a small constant
         magnitude_spectrum = 20 * np.log(np.abs(fshift) + 1e-10)
 
@@ -152,18 +178,21 @@ class Features:
         max_freq = np.max(magnitude_spectrum)
         min_freq = np.min(magnitude_spectrum)
         median_freq = np.median(magnitude_spectrum)
-        energy = np.sum(np.abs(fshift)**2)
-        
+        energy = np.sum(np.abs(fshift) ** 2)
+
         rows, cols = magnitude_spectrum.shape
         crow, ccol = rows // 2, cols // 2  # center
- 
-        histogram, _ = np.histogram(magnitude_spectrum, bins=256, range=(0, 256), density=True)
-        entropy = -np.sum(histogram * np.log2(histogram + 1e-10))  # Adding a small value to avoid log(0)
-        
-    
+
+        histogram, _ = np.histogram(
+            magnitude_spectrum, bins=256, range=(0, 256), density=True
+        )
+        entropy = -np.sum(
+            histogram * np.log2(histogram + 1e-10)
+        )  # Adding a small value to avoid log(0)
+
         skewness = skew(magnitude_spectrum.flatten())
         kurt = kurtosis(magnitude_spectrum.flatten())
-        
+
         low_freq_energy = np.sum(magnitude_spectrum[:crow, :ccol])
         high_freq_energy = np.sum(magnitude_spectrum[crow:, ccol:])
         frequency_contrast = high_freq_energy - low_freq_energy
@@ -184,7 +213,6 @@ class Features:
         }
 
         return frequency_features
-
 
 
 if __name__ == "__main__":
