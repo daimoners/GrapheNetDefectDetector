@@ -5,81 +5,64 @@ attualmente il file ``tuner.py``, ha come modello al suo interno solo il xgBoost
 ``X_norm.npy`` e ``Y_norm.npy``.
 
 Si potrebbe eliminare tutta la parte sotto il fit che è la roba vecchia del tesista. -->
- 
-This repo is about using computer vision techniques (and in particular convolutional neural networks) in order to extract geometrical and frequency features from images and use such features with classical ML techniques to predict the electronic properties of defected graphene flakes. The framework take care to create the dataset starting from a folder of **.xyz** files and a **.csv** file containing the target properties, and uses YOLO for defect detection and XGBoost for target prediction.
+
+This repo is about using computer vision techniques (and in particular convolutional neural networks) in order to extract geometrical and frequency features from images and use such features with classical ML techniques to predict the electronic properties of defected graphene flakes. The framework take care to create the dataset starting from a folder of `.xyz` files and a `.csv` file containing the target properties, and uses YOLO for defect detection and XGBoost for target prediction.
 
 ## Project Structure
-   ```.
+   ```
    ├── project/
-   │ ├── cfg/
-   │ │ └── config.yaml
-   │ ├── dataset/
-   │ │ ├── signals_train.pickle
-   │ │ ├── signals_val.pickle
-   │ │ └── signals_test.pickle
+   │ ├── data/    --> contain the dataset (downloaded from the point 3 of the setup below)
    │ ├── lib/
-   │ │ └── utils.py
-   │ ├── logs/ (folder where the logs will be saved during training/inference)
-   │ ├── models/ (folder where the models will be saved during training)
+   │ │ ├── lib_defect_analysis.py   --> contain the functions to extract the geometric features
+   │ │ └── lib_utils.py             --> contain some useful functions
+   │ ├── optuna/       --> contain the scripts to run the optuna optimization
+   │ ├── yolo/         --> contain the pipeline to train a yolo model from scratch
    │ ├── results/
    │ │ ├── baseline/ (contain the results of the baseline model)
    │ │ └── optimized/ (contain the results of the optimized model)
    │ ├── outputs/ (folder created by hydra containing the experiments hystory)
-   │ ├── conda_environment.yml
-   │ ├── requirements.txt
-   │ ├── signals.pickle
-   │ ├── question_1.py
-   │ └── question_2.py
+   │ ├── environment.yml
+   │ └── main.ipynb    --> main jupyter notebook to train the XGBoost and LightGBM models
    ```
-- The core functionality of this project is provided by the `question_1.py` and `question_2.py` scripts, which will be discussed below. The `utils.py` script, located in the `lib` folder, contains essential training and evaluation utilities, including model checkpointing, performance logging, and standard PyTorch training algorithms. To keep the main scripts focused on the assignment, all non-assignment-specific code has been delegated to this library. Also, `utils.py` includes the implementation of a metrics tracking class for monitoring performance during training and evaluation, as well as an early stopping class.
-
-- The `question_2.py` script, in particular, contains the `Code128Loss`, `Code128Model`, and `SignalDataset` classes discussed in the PDF of the solutions.
-
-- The `dataset` folder contains the split dataset used for training and evaluating the proposed model. You could also create your own split, by running the `question_1.py` script.
-
-- The `results` folder contain the trained models and performance metrics (inside the log files) of the baseline and the optimized models.
-
-- The `models` folder is the default directory where the models will be saved during the training procedure.
 
 ## Usage
 
 ### Setup
 1. Clone the repository and enter the GrapheNetDefectDetector directory:
-
    ```bash
    git clone -b published https://github.com/daimoners/GrapheNetDefectDetector.git --depth 1 && cd GrapheNetDefectDetector
    ```
 
-2. Create the conda env from the environment.yaml file:
-
+2. Create the conda env from the `environment.yaml` file and activate the conda env:
    ```bash
-   conda env create -f environment.yaml
+   conda env create -f environment.yaml && conda activate yolo
    ```
 
-3. Activate the conda env:
-
+3. Download the dataset and unzip it in the root folder:
    ```bash
-   conda activate yolo
+   gdown 'https://drive.google.com/uc?id=1mDVN3YxorrBmQEofuOhyMuRVIL2AwYaa' && unzip data_chapter_7.zip
    ```
 
 ### Configuration and Train
 
-1. Customize the paths in the first block of **main.ipynb** according to your needs
+Just run each block of the `main.ipynb` jupyter notebook (is all already configured). The notebook is explained in detail, illustrating all the various steps to train the XGBoost and LightGBM models.
 
-2. Run the following blocks to train and evaluate the model
 
-### (Optional) Train the YOLO model from scratch
+### (Optional) Re-optimize the hyperparameters with Optuna
 
-In order to optimize the XGBoost parameters for each target, the **tuner.py** script can be launched from the **optuna** folder:
+In order to optimize the XGBoost parameters for current target, the `tuner.py` script can be customized (the ranges of the hyperparameters search space) and launched from the `optuna` folder:
    
    ```bash
    cd optuna && python tuner.py
    ```
 
-### (Optional) Optimization
+### (Optional) Re-train the YOLO model from scratch
 
-In order to optimize the XGBoost parameters for each target, the **tuner.py** script can be launched from the **optuna** folder:
-   
+To retrain the YOLO model, customize the `dataset.yaml` config and run the `dataset_generator.py`, in order to augment and split a dataset from a dataset exported from LabelStudio:
    ```bash
-   cd optuna && python tuner.py
+   cd yolo && python dataset_generator.py
+   ```
+Then, customize the `cfg.yaml` config and run the `train.py`, in order to perform the training of the YOLO model:
+```bash
+   python train.py
    ```
