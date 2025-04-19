@@ -35,7 +35,7 @@ This repo is about using computer vision techniques (and in particular convoluti
 
 2. Create the conda env from the `environment.yaml` file and activate the conda env:
    ```bash
-   conda env create -f environment.yaml && conda activate yolo
+   conda env create -f environment.yaml && conda activate defect_analysis
    ```
 
 3. Download the dataset and unzip it in the root folder:
