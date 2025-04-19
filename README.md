@@ -17,10 +17,6 @@ This repo is about using computer vision techniques (and in particular convoluti
    │ │ └── lib_utils.py             --> contain some useful functions
    │ ├── optuna/       --> contain the scripts to run the optuna optimization
    │ ├── yolo/         --> contain the pipeline to train a yolo model from scratch
-   │ ├── results/
-   │ │ ├── baseline/ (contain the results of the baseline model)
-   │ │ └── optimized/ (contain the results of the optimized model)
-   │ ├── outputs/ (folder created by hydra containing the experiments hystory)
    │ ├── environment.yml
    │ └── main.ipynb    --> main jupyter notebook to train the XGBoost and LightGBM models
    ```
