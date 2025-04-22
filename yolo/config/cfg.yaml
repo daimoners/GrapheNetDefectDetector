@@ -1,4 +1,4 @@
-path: "/home/tom/git_workspace/GrapheNetDefectDetector/yolo/data/augmented_dataset" # dataset root dir
+path: "/home/tom/git_workspace/tesi/GrapheNetDefectDetector/yolo/data/augmented_dataset" # dataset root dir
 train: images/train
 val: images/val
 

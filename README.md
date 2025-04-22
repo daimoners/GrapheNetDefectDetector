@@ -53,12 +53,22 @@ In order to optimize the XGBoost parameters for current target, the `tuner.py` s
    ```
 
 ### (Optional) Re-train the YOLO model from scratch
+1. Download the dataset and unzip it in the root folder:
+   ```bash
+   gdown 'https://drive.google.com/uc?id=1JXNUbSeSRPHVDC3BAegz2VTT6IrFka6S' && unzip data_chapter_7_yolo.zip
+   ```
 
-To retrain the YOLO model, customize the `dataset.yaml` config and run the `dataset_generator.py`, in order to augment and split a dataset from a dataset exported from LabelStudio:
+2. To retrain the YOLO model, customize the `dataset.yaml` config and run the `dataset_generator.py`, in order to augment and split a dataset from the dataset exported from LabelStudio (`original_data`):
    ```bash
    cd yolo && python dataset_generator.py
    ```
-Then, customize the `cfg.yaml` config and run the `train.py`, in order to perform the training of the YOLO model:
+
+3. Then, customize the `cfg.yaml` config and run the `train.py`, in order to perform the training of the YOLO model:
 ```bash
    python train.py
+   ```
+
+4. Move the best checkpoint in the data folder to use it the XGBoost pipeline.
+```bash
+   mv best_model_yolov10n.pt ../data/
    ```

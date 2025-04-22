@@ -1,4 +1,4 @@
-package_path: /home/tom/git_workspace/GrapheNetDefectDetector/yolo
+package_path: /home/tom/git_workspace/tesi/GrapheNetDefectDetector/yolo
 exported_data_path: ${package_path}/data/original_data
 dataset_path: ${package_path}/data/augmented_dataset
 ssim_threshold: 0.8

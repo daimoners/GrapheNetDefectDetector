@@ -190,9 +190,9 @@ def check_unsupported_file_types(data_path: Path):
     ]
     if len(files) > 0:
         raise Exception(
-            f"Unsopported file types detected in {data_path.joinpath("images")}"
+            f"Unsopported file types detected in {data_path.joinpath('images')}"
         )
-    
+
     labels = [
         f
         for f in data_path.joinpath("labels").iterdir()
@@ -200,7 +200,7 @@ def check_unsupported_file_types(data_path: Path):
     ]
     if len(labels) > 0:
         raise Exception(
-            f"Unsopported file types detected in {data_path.joinpath("labels")}"
+            f"Unsopported file types detected in {data_path.joinpath('labels')}"
         )
 
 
